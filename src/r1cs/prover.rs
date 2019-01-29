@@ -696,4 +696,8 @@ impl<'t, 'g> Prover<'t, 'g> {
             ipp_proof,
         })
     }
+
+    pub fn num_constraints(&self) -> usize {
+        self.constraints.len()
+    }
 }
