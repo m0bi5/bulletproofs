@@ -453,7 +453,11 @@ impl<'t> Verifier<'t> {
         let xxx = x * xx;
 
         // group the T_scalars and T_points together
-        let T_scalars = [r * x, rxx * x, rxx * xx, rxx * xxx, rxx * xx * xx];
+        let r_xxx = r * xxx;
+        let r_xxxx = r_xxx * x;
+        let r_xxxxx = r_xxxx * x;
+        let r_xxxxxx = r_xxxxx * x;
+        let T_scalars = [r * x, r_xxx, r_xxxx, r_xxxxx, r_xxxxxx];
         let T_points = [proof.T_1, proof.T_3, proof.T_4, proof.T_5, proof.T_6];
 
         let mega_check = RistrettoPoint::optional_multiscalar_mul(
