@@ -138,6 +138,19 @@ impl<'t> RandomizableConstraintSystem for Verifier<'t> {
         self.deferred_constraints.push(Box::new(callback));
         Ok(())
     }
+
+    fn evaluate_lc(&self, _: &LinearCombination) -> Option<Scalar> {
+        None
+    }
+
+    fn allocate_single(&mut self, _: Option<Scalar>) -> Result<(Variable, Option<Variable>), R1CSError> {
+        let var = self.allocate(None)?;
+        match var {
+            Variable::MultiplierLeft(i) => Ok((Variable::MultiplierLeft(i), None)),
+            Variable::MultiplierRight(i) => Ok((Variable::MultiplierRight(i), Some(Variable::MultiplierOutput(i)))),
+            _ => Err(R1CSError::FormatError)
+        }
+    }
 }
 
 impl<'t> ConstraintSystem for RandomizingVerifier<'t> {
@@ -170,6 +183,14 @@ impl<'t> ConstraintSystem for RandomizingVerifier<'t> {
 
     fn constrain(&mut self, lc: LinearCombination) {
         self.verifier.constrain(lc)
+    }
+
+    fn evaluate_lc(&self, _: &LinearCombination) -> Option<Scalar> {
+        None
+    }
+
+    fn allocate_single(&mut self, _: Option<Scalar>) -> Result<(Variable, Option<Variable>), R1CSError> {
+        self.verifier.allocate_single(None)
     }
 }
 

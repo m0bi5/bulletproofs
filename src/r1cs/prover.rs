@@ -179,6 +179,19 @@ impl<'t, 'g> RandomizableConstraintSystem for Prover<'t, 'g> {
         self.deferred_constraints.push(Box::new(callback));
         Ok(())
     }
+
+    fn evaluate_lc(&self, lc: &LinearCombination) -> Option<Scalar> {
+        Some(self.eval(lc))
+    }
+
+    fn allocate_single(&mut self, assignment: Option<Scalar>) -> Result<(Variable, Option<Variable>), R1CSError> {
+        let var = self.allocate(assignment)?;
+        match var {
+            Variable::MultiplierLeft(i) => Ok((Variable::MultiplierLeft(i), None)),
+            Variable::MultiplierRight(i) => Ok((Variable::MultiplierRight(i), Some(Variable::MultiplierOutput(i)))),
+            _ => Err(R1CSError::FormatError)
+        }
+    }
 }
 
 impl<'t, 'g> ConstraintSystem for RandomizingProver<'t, 'g> {
@@ -211,6 +224,14 @@ impl<'t, 'g> ConstraintSystem for RandomizingProver<'t, 'g> {
 
     fn constrain(&mut self, lc: LinearCombination) {
         self.prover.constrain(lc)
+    }
+
+    fn evaluate_lc(&self, lc: &LinearCombination) -> Option<Scalar> {
+        self.prover.evaluate_lc(lc)
+    }
+
+    fn allocate_single(&mut self, assignment: Option<Scalar>) -> Result<(Variable, Option<Variable>), R1CSError> {
+        self.prover.allocate_single(assignment)
     }
 }
 
