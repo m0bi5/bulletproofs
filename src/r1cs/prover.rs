@@ -167,18 +167,6 @@ impl<'t, 'g> ConstraintSystem for Prover<'t, 'g> {
         // (e.g. that variables are valid, that the linear combination evals to 0 for prover, etc).
         self.constraints.push(lc);
     }
-}
-
-impl<'t, 'g> RandomizableConstraintSystem for Prover<'t, 'g> {
-    type RandomizedCS = RandomizingProver<'t, 'g>;
-
-    fn specify_randomized_constraints<F>(&mut self, callback: F) -> Result<(), R1CSError>
-    where
-        F: 'static + Fn(&mut Self::RandomizedCS) -> Result<(), R1CSError>,
-    {
-        self.deferred_constraints.push(Box::new(callback));
-        Ok(())
-    }
 
     fn evaluate_lc(&self, lc: &LinearCombination) -> Option<Scalar> {
         Some(self.eval(lc))
@@ -191,6 +179,18 @@ impl<'t, 'g> RandomizableConstraintSystem for Prover<'t, 'g> {
             Variable::MultiplierRight(i) => Ok((Variable::MultiplierRight(i), Some(Variable::MultiplierOutput(i)))),
             _ => Err(R1CSError::FormatError)
         }
+    }
+}
+
+impl<'t, 'g> RandomizableConstraintSystem for Prover<'t, 'g> {
+    type RandomizedCS = RandomizingProver<'t, 'g>;
+
+    fn specify_randomized_constraints<F>(&mut self, callback: F) -> Result<(), R1CSError>
+    where
+        F: 'static + Fn(&mut Self::RandomizedCS) -> Result<(), R1CSError>,
+    {
+        self.deferred_constraints.push(Box::new(callback));
+        Ok(())
     }
 }
 

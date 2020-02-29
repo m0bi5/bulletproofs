@@ -126,18 +126,6 @@ impl<'t> ConstraintSystem for Verifier<'t> {
         // evals to 0 for prover, etc).
         self.constraints.push(lc);
     }
-}
-
-impl<'t> RandomizableConstraintSystem for Verifier<'t> {
-    type RandomizedCS = RandomizingVerifier<'t>;
-
-    fn specify_randomized_constraints<F>(&mut self, callback: F) -> Result<(), R1CSError>
-    where
-        F: 'static + Fn(&mut Self::RandomizedCS) -> Result<(), R1CSError>,
-    {
-        self.deferred_constraints.push(Box::new(callback));
-        Ok(())
-    }
 
     fn evaluate_lc(&self, _: &LinearCombination) -> Option<Scalar> {
         None
@@ -150,6 +138,18 @@ impl<'t> RandomizableConstraintSystem for Verifier<'t> {
             Variable::MultiplierRight(i) => Ok((Variable::MultiplierRight(i), Some(Variable::MultiplierOutput(i)))),
             _ => Err(R1CSError::FormatError)
         }
+    }
+}
+
+impl<'t> RandomizableConstraintSystem for Verifier<'t> {
+    type RandomizedCS = RandomizingVerifier<'t>;
+
+    fn specify_randomized_constraints<F>(&mut self, callback: F) -> Result<(), R1CSError>
+    where
+        F: 'static + Fn(&mut Self::RandomizedCS) -> Result<(), R1CSError>,
+    {
+        self.deferred_constraints.push(Box::new(callback));
+        Ok(())
     }
 }
 

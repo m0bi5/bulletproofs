@@ -69,12 +69,12 @@ pub fn vector_product_gadget<CS: ConstraintSystem>(
         let (a, b, o) = cs.allocate_multiplier(|| {
             let bit: u64 = vector[i].assignment.ok_or(R1CSError::MissingAssignment)?;
             let val = value.assignment.ok_or(R1CSError::MissingAssignment)?;
-            Ok((items[i].into(), bit.into(), (bit*val).into()))
+            (items[i].into(), bit.into(), (bit*val).into())
         })?;
 
         let (a, b, o) = cs.allocate_multiplier(vector[i].assignment.map( |bit| {
             let val = value.assignment.ok_or(R1CSError::MissingAssignment)?;
-            Ok((items[i].into(), bit.into(), (bit*val).into()))
+            (items[i].into(), bit.into(), (bit*val).into())
         }))?;
 
 
