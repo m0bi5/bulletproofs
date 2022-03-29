@@ -123,9 +123,9 @@ pub struct BulletproofGens {
     /// Number of values or parties
     pub party_capacity: usize,
     /// Precomputed \\(\mathbf G\\) generators for each party.
-    G_vec: Vec<Vec<RistrettoPoint>>,
+    pub G_vec: Vec<Vec<RistrettoPoint>>,
     /// Precomputed \\(\mathbf H\\) generators for each party.
-    H_vec: Vec<Vec<RistrettoPoint>>,
+    pub H_vec: Vec<Vec<RistrettoPoint>>,
 }
 
 impl BulletproofGens {
@@ -182,7 +182,7 @@ impl BulletproofGens {
     }
 
     /// Return an iterator over the aggregation of the parties' G generators with given size `n`.
-    pub(crate) fn G(&self, n: usize, m: usize) -> impl Iterator<Item = &RistrettoPoint> {
+    pub fn G(&self, n: usize, m: usize) -> impl Iterator<Item = &RistrettoPoint> {
         AggregatedGensIter {
             n,
             m,
@@ -193,7 +193,7 @@ impl BulletproofGens {
     }
 
     /// Return an iterator over the aggregation of the parties' H generators with given size `n`.
-    pub(crate) fn H(&self, n: usize, m: usize) -> impl Iterator<Item = &RistrettoPoint> {
+    pub fn H(&self, n: usize, m: usize) -> impl Iterator<Item = &RistrettoPoint> {
         AggregatedGensIter {
             n,
             m,
